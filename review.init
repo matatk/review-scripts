@@ -1,0 +1,88 @@
+#!/bin/sh
+config_file='review.config.sh'
+script=$(basename "$0")
+
+echo "$script: initialise a new review"
+echo
+
+help() {
+	echo "Usage: $script            - initialise the review"
+	echo "   or: $script -h|--help  - show this help message"
+	echo
+	echo "Config file $config_file will be created, which you'll"
+	echo "have the opportunity to edit."
+	echo
+	echo "Commits will be saved to the 'todo' file in chronological"
+	echo "order."
+}
+
+if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+	help
+	exit 0
+fi
+
+if ! command -v git > /dev/null; then
+	echo Git not found - aborting.
+	exit 42
+fi
+
+if ! git rev-parse --git-dir 2> /dev/null > /dev/null; then
+	echo Current directory is not a Git repo - aborting.
+	exit 42
+fi
+
+if [ ! -r $config_file ]; then
+	echo Creating config file...
+	cat << EOF > $config_file
+# shellcheck shell=sh
+export START_DATE='8th August 2017'  # HTML 5.2 CR was published on this day
+export END_DATE='17th July 2019'     # Review draft was published on the 16th
+export NONESSENTIAL_COMMIT_MSG_EXTENDED_REGEXP='^.{8} (Editorial|Meta): '
+export SOURCE_FILE='source'
+export URL_COMMIT_START='https://github.com/whatwg/html/commit'  # / added later
+
+export FILE_COMMITS_TO_REVIEW='review.state.todo'
+export FILE_COMMIT_IN_REVIEW='review.state.current'
+export FILE_COMMITS_REVIEWED='review.state.done'
+export FILE_COMMITS_PARKED='review.state.parked'
+
+export HTML_STYLE='
+	table { border-collapse: collapse; }
+	th, td { padding: 0.5em; }
+	th { background-color: #555; color: white; }
+	tr:nth-child(even) { background-color: #eee; }
+	tr:nth-child(odd) { background-color: #ccc; }'
+EOF
+
+	echo Config file created, as follows.
+	echo
+	cat $config_file
+	echo
+	echo If this seems OK, press Enter to continue.
+	echo Otherwise: interrupt the script, edit the config and re-run the script.
+	read -r
+fi
+
+# shellcheck source=review.config.sh
+. $config_file
+
+if [ -r "$FILE_COMMITS_TO_REVIEW" ] || [ -r "$FILE_COMMITS_REVIEWED" ]; then
+	echo "There's already a review in progress - aborting."
+	exit 42
+fi
+
+commits_in_range() {
+	git log --after "$START_DATE" --before "$END_DATE" \
+		--oneline --reverse $SOURCE_FILE
+}
+
+grep_nonessential_commits() {
+	# This is tuned for the HTML standard
+	grep -E "$NONESSENTIAL_COMMIT_MSG_EXTENDED_REGEXP" "$@"
+}
+
+echo "$(commits_in_range | wc -l | tr -d '[:space:]') commits between the dates"
+echo "$(commits_in_range | grep_nonessential_commits -vc) substantive commits between the dates"
+
+echo Saving commits to review, in chronological order...
+commits_in_range | grep_nonessential_commits -v > "$FILE_COMMITS_TO_REVIEW"

@@ -1,0 +1,36 @@
+#!/bin/sh
+. review.config.sh
+
+help() {
+	script=$(basename "$0")
+	echo "$script: set aside the commit under review for later"
+	echo
+	echo "Usage: $script            - park the current commit"
+	echo "   or: $script -h|--help  - show this help message"
+	echo
+	echo "Parked commits are appended to any existing parked commits,"
+	echo "attempting to preserve chronological order."
+}
+
+park_current_commit() {
+	if [ -r $FILE_COMMIT_IN_REVIEW ]; then
+		echo "Parking:"
+		cat $FILE_COMMIT_IN_REVIEW
+		cat $FILE_COMMIT_IN_REVIEW >> $FILE_COMMITS_PARKED
+		rm $FILE_COMMIT_IN_REVIEW
+	else
+		echo "No current commit - aborting"
+		exit 42
+	fi
+}
+
+main() {
+	if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+		help
+		exit 0
+	fi
+
+	park_current_commit
+}
+
+main "$@"

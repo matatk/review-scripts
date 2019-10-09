@@ -1,0 +1,59 @@
+#!/bin/sh
+. review.config.sh
+
+help() {
+	script=$(basename "$0")
+	echo "$script: make an HTML version of the reviewed commits"
+	echo
+	echo "Usage: $script            - generate HTML on stdout"
+	echo "   or: $script -h|--help  - show this help message"
+}
+
+if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+	help
+	exit 0
+fi
+
+if [ ! -r "$FILE_COMMITS_REVIEWED" ]; then
+	echo "No commits to review - aborting"
+	exit 42
+fi
+
+num_reviewed=$(($(wc -l < $FILE_COMMITS_REVIEWED | tr -d '[:space:]') / 3))
+
+echo "<html><head><title>$FILE_COMMITS_REVIEWED</title>"
+echo "<style>$HTML_STYLE</style></head>"
+echo "<body><h1>$FILE_COMMITS_REVIEWED</h1>"
+echo "<p>$num_reviewed reviewed</p>"
+echo "<table>"
+echo "<tr><th>Commit</th><th>Summary</th><th>Notes</th></tr>"
+
+counter=0
+
+while read -r line; do
+	case $counter in
+		0)
+			hash=$(echo "$line" | cut -d ' ' -f 1)
+			info=$(echo "$line" | sed 's/^.\{9\}//' | \
+				sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g;')
+			counter=$((counter + 1))
+			;;
+		1)
+			review_note=$line
+			echo "<tr>"
+			echo "<td><a href='$URL_COMMIT_START/$hash'>$hash</a></td>"
+			echo "<td><p>$info</p></td>"
+			echo "<td><p>$review_note</p></td>"
+			echo "</tr>"
+			counter=$((counter + 1))
+			;;
+		2)
+			counter=0
+			;;
+		*)
+			echo "Error: counter is $counter (should be 0-2) - aborting"
+			exit 42
+	esac
+done < $FILE_COMMITS_REVIEWED
+
+echo "</table></body></html>"

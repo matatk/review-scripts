@@ -1,0 +1,71 @@
+#!/bin/sh
+. review.config.sh
+
+hash=''
+
+help() {
+	script=$(basename "$0")
+	echo "$script: retrieve the next commit and start reviewing it"
+	echo
+	echo "Usage: $script txt        - review with git show"
+	echo "   or: $script web        - review on GitHub"
+	echo "   or: $script            - show summary of commit to review"
+	echo "   or: $script -h|--help  - show this help message"
+	echo
+	echo "The next commit is retrieved from the beginning of the 'todo'"
+	echo "file, attempting to preserve chronological order."
+}
+
+get_next_commit() {
+	temp_file="$FILE_COMMITS_TO_REVIEW.temp"
+
+	if [ ! -r "$FILE_COMMIT_IN_REVIEW" ]; then
+		if [ -r "$temp_file" ]; then
+			echo "There's already a file called $temp_file - aborting"
+			exit 42
+		fi
+		if [ ! -r "$FILE_COMMITS_TO_REVIEW" ]; then
+			echo "No commits to review - aborting"
+			exit 42
+		fi
+		head -n 1 $FILE_COMMITS_TO_REVIEW > $FILE_COMMIT_IN_REVIEW
+		tail -n +2 $FILE_COMMITS_TO_REVIEW > $temp_file \
+			&& mv $temp_file $FILE_COMMITS_TO_REVIEW
+		echo "Next commit to review:"
+	else
+		echo "Commit in review:"
+	fi
+}
+
+show_current_commit_and_num_left() {
+	cat $FILE_COMMIT_IN_REVIEW
+	echo "$(wc -l < $FILE_COMMITS_TO_REVIEW |
+		tr -d '[:space:]') to review after this one"
+}
+
+prepare_and_show() {
+	get_next_commit
+	hash=$(cut -d ' ' -f 1 < $FILE_COMMIT_IN_REVIEW)
+	show_current_commit_and_num_left
+}
+
+main() {
+	if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+		help
+		exit 0
+	fi
+
+	case "$1" in
+		'txt')
+			prepare_and_show
+			git show "$hash"
+			;;
+		'web')
+			prepare_and_show
+			open "$URL_COMMIT_START/$hash"
+			;;
+		*)	prepare_and_show
+	esac
+}
+
+main "$@"

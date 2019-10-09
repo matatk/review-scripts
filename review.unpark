@@ -1,0 +1,91 @@
+#!/bin/sh
+. review.config.sh
+
+help() {
+	script=$(basename "$0")
+	echo "$script: bring back parked commits into the 'todo' list"
+	echo
+	echo "Usage: $script            - unpark one commit"
+	echo "Usage: $script all        - unpark all commits"
+	echo "   or: $script -h|--help  - show this help message"
+	echo
+	echo "Single commits are unparked from the beginning of the"
+	echo "parked list, and prepended to the 'todo' file, with the"
+	echo "aim of preserving chronological order."
+}
+
+unpark_one_commit() {
+	if [ ! -r  $FILE_COMMITS_PARKED ]; then
+		echo No parked commits file - aborting.
+		exit 42
+	fi
+
+	parked_temp_file="$FILE_COMMITS_PARKED.temp"
+
+	if [ -r "$parked_temp_file" ]; then
+		echo "There's already a file called $parked_temp_file - aborting"
+		exit 42
+	fi
+
+	if [ -r $FILE_COMMITS_TO_REVIEW ]; then
+		todo_temp_file="$FILE_COMMITS_TO_REVIEW.temp"
+
+		if [ -r "$todo_temp_file" ]; then
+			echo "There's already a file called $todo_temp_file - aborting"
+			exit 42
+		fi
+
+		mv $FILE_COMMITS_TO_REVIEW $todo_temp_file \
+			&& head -n 1 $FILE_COMMITS_PARKED > $FILE_COMMITS_TO_REVIEW \
+			&& cat $todo_temp_file >> $FILE_COMMITS_TO_REVIEW \
+			&& rm $todo_temp_file \
+			&& tail -n +2 $FILE_COMMITS_PARKED > $parked_temp_file \
+			&& mv $parked_temp_file $FILE_COMMITS_PARKED
+	else
+		head -n 1 $FILE_COMMITS_PARKED > $FILE_COMMITS_TO_REVIEW \
+			&& tail -n +2 $FILE_COMMITS_PARKED > $parked_temp_file \
+			&& mv $parked_temp_file $FILE_COMMITS_PARKED
+	fi
+
+	if [ "$(du $FILE_COMMITS_PARKED | cut -f1)" = '0' ]; then
+		rm $FILE_COMMITS_PARKED
+	fi
+}
+
+unpark_all_commits() {
+	if [ ! -r  $FILE_COMMITS_PARKED ]; then
+		echo No parked commits file - aborting.
+		exit 42
+	fi
+
+	if [ -r $FILE_COMMITS_TO_REVIEW ]; then
+		todo_temp_file="$FILE_COMMITS_TO_REVIEW.temp"
+
+		if [ -r "$todo_temp_file" ]; then
+			echo "There's already a file called $todo_temp_file - aborting"
+			exit 42
+		fi
+
+		mv $FILE_COMMITS_TO_REVIEW $todo_temp_file \
+			&& mv $FILE_COMMITS_PARKED $FILE_COMMITS_TO_REVIEW \
+			&& cat $todo_temp_file >> $FILE_COMMITS_TO_REVIEW \
+			&& rm $todo_temp_file
+	else
+		mv $FILE_COMMITS_TO_REVIEW $todo_temp_file
+	fi
+}
+
+main() {
+	if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+		help
+		exit 0
+	fi
+
+	if [ "$1" = 'all' ]; then
+		unpark_all_commits
+	else
+		unpark_one_commit
+	fi
+}
+
+main "$@"

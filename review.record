@@ -1,0 +1,60 @@
+#!/bin/sh
+. review.config.sh
+
+help() {
+	script=$(basename "$0")
+	echo "$script: record review result for the current commit"
+	echo
+	echo "Usage: $script na           - log the commit as not applicable"
+	echo "   or: $script l <message>  - log the given <message> for the commit"
+	echo "   or: $script -h|--help    - show this help message"
+	echo
+	echo "The current commit in review will be moved to the results file."
+}
+
+if [ ! -r $FILE_COMMIT_IN_REVIEW ]; then
+	echo "No commit in review - aborting"
+	exit 42
+fi
+
+_record_result() {
+	info=$(cat $FILE_COMMIT_IN_REVIEW)
+	message=$*
+
+	echo "For: $info"
+	echo "Recording: $message"
+
+	{
+		echo "$info"
+		echo "$message"
+		echo
+	} >> $FILE_COMMITS_REVIEWED
+
+	rm $FILE_COMMIT_IN_REVIEW
+}
+
+not_applicable() {
+	_record_result "N/A"
+}
+
+custom_message() {
+	if [ ! "$1" ]; then
+		echo No custom message given - aborting
+		help
+		exit 42
+	fi
+
+	_record_result "$@"
+}
+
+case "$1" in
+	'na')
+		not_applicable
+		;;
+	'l')
+		shift
+		custom_message "$@"
+		;;
+	*)
+		help
+esac
