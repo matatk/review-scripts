@@ -1,29 +1,39 @@
 #!/bin/sh
 . review.config.sh
+reviewed_file=$FILE_COMMITS_REVIEWED
 
 help() {
 	script=$(basename "$0")
 	echo "$script: make an HTML version of the reviewed commits"
 	echo
-	echo "Usage: $script            - generate HTML on stdout"
-	echo "   or: $script -h|--help  - show this help message"
+	echo "Usage: $script [-r <file>] [-h]"
+	echo
+	echo "Options:"
+	echo "    -r <file>    -- override default review results file"
+	echo "    -h           -- show this help message"
+	echo
+	echo "The HTML will be generated on stdout."
 }
 
-if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
-	help
-	exit 0
-fi
+while getopts 'r:h' o; do
+	case $o in
+		r) reviewed_file=$OPTARG ;;
+		h|*) help; exit 0
+	esac
+done
 
-if [ ! -r "$FILE_COMMITS_REVIEWED" ]; then
+shift $((OPTIND-1))
+
+if [ ! -r "$reviewed_file" ]; then
 	echo "No commits to review - aborting"
 	exit 42
 fi
 
-num_reviewed=$(($(wc -l < $FILE_COMMITS_REVIEWED | tr -d '[:space:]') / 3))
+num_reviewed=$(($(wc -l < "$reviewed_file" | tr -d '[:space:]') / 3))
 
-echo "<html><head><title>$FILE_COMMITS_REVIEWED</title>"
+echo "<html><head><title>$reviewed_file</title>"
 echo "<style>$HTML_STYLE</style></head>"
-echo "<body><h1>$FILE_COMMITS_REVIEWED</h1>"
+echo "<body><h1>$reviewed_file</h1>"
 echo "<p>$num_reviewed reviewed</p>"
 echo "<table>"
 echo "<tr><th>Commit</th><th>Summary</th><th>Notes</th></tr>"
@@ -54,6 +64,6 @@ while read -r line; do
 			echo "Error: counter is $counter (should be 0-2) - aborting"
 			exit 42
 	esac
-done < $FILE_COMMITS_REVIEWED
+done < "$reviewed_file"
 
 echo "</table></body></html>"

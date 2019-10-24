@@ -3,15 +3,20 @@
 
 help() {
 	script=$(basename "$0")
-	echo "$script: bring back parked commits into the 'todo' list"
+	echo "$script: bring back parked commits into the todo list"
 	echo
-	echo "Usage: $script            - unpark one commit"
-	echo "Usage: $script all        - unpark all commits"
-	echo "   or: $script -h|--help  - show this help message"
+	echo "Usage: $script [-h] [all]"
 	echo
-	echo "Single commits are unparked from the beginning of the"
-	echo "parked list, and prepended to the 'todo' file, with the"
-	echo "aim of preserving chronological order."
+	echo "Options:"
+	echo "    -h     -- show this help message"
+	echo
+	echo "Optional subcommand:"
+	echo "    all    -- unpark all parked commits"
+	echo
+	echo "By default, only a single commit is unparked, from the"
+	echo "beginning of the parked list."
+	echo
+	echo "Commits are prepended to the todo file."
 }
 
 unpark_one_commit() {
@@ -76,7 +81,7 @@ unpark_all_commits() {
 }
 
 main() {
-	if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+	if [ "$1" = '-h' ]; then
 		help
 		exit 0
 	fi

@@ -5,8 +5,10 @@ help() {
 	script=$(basename "$0")
 	echo "$script: set aside the commit under review for later"
 	echo
-	echo "Usage: $script            - park the current commit"
-	echo "   or: $script -h|--help  - show this help message"
+	echo "Usage: $script [-h]"
+	echo
+	echo "Options:"
+	echo "    -h    -- show this help message"
 	echo
 	echo "Parked commits are appended to any existing parked commits,"
 	echo "attempting to preserve chronological order."
@@ -25,7 +27,7 @@ park_current_commit() {
 }
 
 main() {
-	if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+	if [ "$1" ]; then
 		help
 		exit 0
 	fi

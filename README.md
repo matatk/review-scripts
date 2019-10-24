@@ -57,13 +57,13 @@ If you get stuck and need to return to a particular commit later, you can 'park'
 
 1. Call `review.park` to move the current commit under review to a 'parked' list (named `review.state.parked` by default). Subsequent calls to `review.park` will be operating on newer 'current' commits, so they're added to the end of the parked list, in order to try to preserve their chronology.
 
-2. Use `review.unpark` to bring the oldest commit from the 'parked' list into the list of commits to be reviewed. The popped parked commit is prepended to the 'todo' list, again with the aim of keeping the commits in chronological order. (However, if you've parked more than one commit, and don't review it before calling `review.unpark` again, things will go out of skew chronology-wise.)
+2. Use `review.unpark` to bring the oldest commit from the 'parked' list into the list of commits to be reviewed. The popped parked commit is prepended to the todo list, again with the aim of keeping the commits in chronological order. (However, if you've parked more than one commit, and don't review it before calling `review.unpark` again, things will go out of skew chronology-wise.)
 
-   If you have multiple parked commits and want to bring them _all_ back to the start of the 'todo' list, you can issue `review.unpark all`—doing so will keep things in order.
+   If you have multiple parked commits and want to bring them _all_ back to the start of the todo list, you can issue `review.unpark all`—doing so will keep things in order.
 
 ### Online help
 
-All of the scripts support `-h`/`--help` options.
+All of the scripts support the `-h` option (be sure to pass it as the first argument).
 
 Collaboration
 -------------

@@ -6,17 +6,19 @@ echo "$script: initialise a new review"
 echo
 
 help() {
-	echo "Usage: $script            - initialise the review"
-	echo "   or: $script -h|--help  - show this help message"
+	echo "Usage: $script [-h]"
 	echo
-	echo "Config file $config_file will be created, which you'll"
+	echo "Options:"
+	echo "    -h    -- show this help message"
+	echo
+	echo "Config file '$config_file' will be created, which you'll"
 	echo "have the opportunity to edit."
 	echo
-	echo "Commits will be saved to the 'todo' file in chronological"
+	echo "Commits will be saved to the todo file in chronological"
 	echo "order."
 }
 
-if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+if [ "$1" ]; then
 	help
 	exit 0
 fi

@@ -8,18 +8,25 @@ help() {
 	script=$(basename "$0")
 	echo "$script: retrieve the next commit and start reviewing it"
 	echo
-	echo "Usage: $script txt        - review with git show"
-	echo "   or: $script web        - review on GitHub"
-	echo "   or: $script            - show summary of commit to review"
-	echo "   or: $script -h|--help  - show this help message"
+	echo "Usage: $script [-h] [txt|web]"
 	echo
-	echo "The next commit is retrieved from the beginning of the 'todo'"
+	echo "Options:"
+	echo "    -h     -- show this help message"
+	echo
+	echo "Optional subcommands:"
+	echo "    txt    -- review with 'git show'"
+	echo "    web    -- review on the web"
+	echo
+	echo "Specifying no subcommand will cause only the commit's short"
+	echo "hash and summary to be shown."
+	echo
+	echo "The next commit is retrieved from the beginning of the todo"
 	echo "file, attempting to preserve chronological order."
 }
 
 mini_help() {
 	echo "Pass 'txt' or 'web' to examine the commit as soon as it's retrieved."
-	echo "Use -h/--help for more information."
+	echo "Use -h for more information."
 }
 
 get_next_commit() {
@@ -34,9 +41,11 @@ get_next_commit() {
 			echo "No commits to review - aborting"
 			exit 42
 		fi
+
 		head -n 1 $FILE_COMMITS_TO_REVIEW > $FILE_COMMIT_IN_REVIEW
 		tail -n +2 $FILE_COMMITS_TO_REVIEW > $temp_file \
 			&& mv $temp_file $FILE_COMMITS_TO_REVIEW
+
 		echo "Next commit to review:"
 		first_run=true
 	else
@@ -57,7 +66,7 @@ prepare_and_show() {
 }
 
 main() {
-	if [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+	if [ "$1" = '-h' ]; then
 		help
 		exit 0
 	fi
