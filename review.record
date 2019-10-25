@@ -6,15 +6,15 @@ help() {
 	script=$(basename "$0")
 	echo "$script: record review result for the current commit"
 	echo
-	echo "Usage: $script [-r <file>] [-h] {na | l <message>}"
+	echo "Usage: $script [-r <file>] [-h] {na | log <message>}"
 	echo
 	echo "Options:"
-	echo "    -r <file>      -- override default review results file"
-	echo "    -h             -- show this help message"
+	echo "    -r <file>        -- override default review results file"
+	echo "    -h               -- show this help message"
 	echo
 	echo "Subcommands:"
-	echo "    na             -- log the commit as not applicable"
-	echo "    l <message>    -- log the given <message> for the commit"
+	echo "    na               -- log the commit as not applicable"
+	echo "    log <message>    -- log the given <message> for the commit"
 	echo
 	echo "The current commit in review will be moved to the results file."
 }
@@ -67,7 +67,7 @@ case "$1" in
 	'na')
 		not_applicable
 		;;
-	'l')
+	'log')
 		shift
 		custom_message "$@"
 		;;

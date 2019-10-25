@@ -47,7 +47,7 @@ Detailed workflow steps
 
 2. To pop the next commit off the queue for review, you can use the `review.next` script. Use `review.next txt` to open the commit to review using `git show`, or `review.next web` to open the commit on the web (if it's hosted somewhere). If you call `review.next` again, it won't pop another commit.
 
-3. To record a result, or some notes, for your review, use `review.record`. If the commit is not relevant, use `review.record na`. If it is relevant, use `review.record l <message>`.
+3. To record a result, or some notes, for your review, use `review.record`. If the commit is not relevant, use `review.record na`. If it is relevant, use `review.record log <message>`.
 
    You can make an HTML version of the commits that have been reviewed, with the review messages, using `review.html.done`.
 
