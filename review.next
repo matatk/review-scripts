@@ -8,10 +8,11 @@ help() {
 	script=$(basename "$0")
 	echo "$script: retrieve the next commit and start reviewing it"
 	echo
-	echo "Usage: $script [-h] [txt|web]"
+	echo "Usage: $script [-c <hash>] [-h] [txt|web]"
 	echo
 	echo "Options:"
-	echo "    -h     show this help message"
+	echo "    -c <hash>    act upon given commit hash; not next/current"
+	echo "    -h           show this help message"
 	echo
 	echo "Optional subcommands:"
 	echo "    txt    review with 'git show'"
@@ -51,6 +52,8 @@ get_next_commit() {
 	else
 		echo "Commit in review:"
 	fi
+
+	hash=$(cut -d ' ' -f 1 < $FILE_COMMIT_IN_REVIEW)
 }
 
 count_remaining_commits() {
@@ -59,36 +62,52 @@ count_remaining_commits() {
 	echo "$(wc -l < "$list" | tr -d '[:space:]') $message"
 }
 
-show_current_commit_and_num_left() {
+show_current_commit() {
 	cat $FILE_COMMIT_IN_REVIEW
+}
+
+show_cli_commit() {
+	git log -1 --oneline "$hash"
+}
+
+show_num_left() {
 	count_remaining_commits $FILE_COMMITS_TO_REVIEW 'left to review'
 	if [ -r $FILE_COMMITS_PARKED ]; then
 		count_remaining_commits $FILE_COMMITS_PARKED 'parked'
 	fi
 }
 
-prepare_and_show() {
-	get_next_commit
-	hash=$(cut -d ' ' -f 1 < $FILE_COMMIT_IN_REVIEW)
-	show_current_commit_and_num_left
+get_and_show_commit_info() {
+	if [ -z "$hash" ]; then
+		get_next_commit
+		show_current_commit
+	else
+		show_cli_commit
+	fi
+	show_num_left
 }
 
 main() {
-	if [ "$1" = '-h' ]; then
-		help
-		exit 0
-	fi
+	while getopts 'c:h' o; do
+		case $o in
+			c) hash=$OPTARG ;;
+			h|*) help; exit 0
+		esac
+	done
+
+	shift $((OPTIND-1))
 
 	case "$1" in
 		'txt')
-			prepare_and_show
+			get_and_show_commit_info
 			git show "$hash"
 			;;
 		'web')
-			prepare_and_show
+			get_and_show_commit_info
 			open "$URL_COMMIT_START/$hash"
 			;;
-		*)	prepare_and_show
+		*)
+			get_and_show_commit_info
 			if $first_run; then
 				mini_help
 			fi
