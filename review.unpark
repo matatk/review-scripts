@@ -8,10 +8,10 @@ help() {
 	echo "Usage: $script [-h] [all]"
 	echo
 	echo "Options:"
-	echo "    -h     -- show this help message"
+	echo "    -h     show this help message"
 	echo
 	echo "Optional subcommand:"
-	echo "    all    -- unpark all parked commits"
+	echo "    all    unpark all parked commits"
 	echo
 	echo "By default, only a single commit is unparked, from the"
 	echo "beginning of the parked list."

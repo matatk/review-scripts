@@ -8,7 +8,7 @@ help() {
 	echo "Usage: $script [-h]"
 	echo
 	echo "Options:"
-	echo "    -h    -- show this help message"
+	echo "    -h    show this help message"
 	echo
 	echo "Parked commits are appended to any existing parked commits,"
 	echo "attempting to preserve chronological order."

@@ -9,8 +9,8 @@ help() {
 	echo "Usage: $script [-r <file>] [-h]"
 	echo
 	echo "Options:"
-	echo "    -r <file>    -- override default review results file"
-	echo "    -h           -- show this help message"
+	echo "    -r <file>    override default review results file"
+	echo "    -h           show this help message"
 	echo
 	echo "The HTML will be generated on stdout."
 }

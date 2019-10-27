@@ -9,7 +9,7 @@ help() {
 	echo "Usage: $script [-h]"
 	echo
 	echo "Options:"
-	echo "    -h    -- show this help message"
+	echo "    -h    show this help message"
 	echo
 	echo "Config file '$config_file' will be created, which you'll"
 	echo "have the opportunity to edit."

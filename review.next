@@ -11,11 +11,11 @@ help() {
 	echo "Usage: $script [-h] [txt|web]"
 	echo
 	echo "Options:"
-	echo "    -h     -- show this help message"
+	echo "    -h     show this help message"
 	echo
 	echo "Optional subcommands:"
-	echo "    txt    -- review with 'git show'"
-	echo "    web    -- review on the web"
+	echo "    txt    review with 'git show'"
+	echo "    web    review on the web"
 	echo
 	echo "Specifying no subcommand will cause only the commit's short"
 	echo "hash and summary to be shown."
