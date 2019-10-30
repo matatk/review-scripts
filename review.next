@@ -47,6 +47,10 @@ get_next_commit() {
 		tail -n +2 $FILE_COMMITS_TO_REVIEW > $temp_file \
 			&& mv $temp_file $FILE_COMMITS_TO_REVIEW
 
+		if [ "$(du $FILE_COMMITS_TO_REVIEW | cut -f1)" = '0' ]; then
+			rm $FILE_COMMITS_TO_REVIEW
+		fi
+
 		echo "Next commit to review:"
 		first_run=true
 	else
@@ -71,7 +75,11 @@ show_cli_commit() {
 }
 
 show_num_left() {
-	count_remaining_commits $FILE_COMMITS_TO_REVIEW 'left to review'
+	if [ -r $FILE_COMMITS_TO_REVIEW ]; then
+		count_remaining_commits $FILE_COMMITS_TO_REVIEW 'left to review'
+	else
+		echo "No more commits to review"
+	fi
 	if [ -r $FILE_COMMITS_PARKED ]; then
 		count_remaining_commits $FILE_COMMITS_PARKED 'parked'
 	fi
