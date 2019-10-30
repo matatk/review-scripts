@@ -20,11 +20,6 @@ help() {
 }
 
 unpark_one_commit() {
-	if [ ! -r  $FILE_COMMITS_PARKED ]; then
-		echo No parked commits file - aborting.
-		exit 42
-	fi
-
 	parked_temp_file="$FILE_COMMITS_PARKED.temp"
 
 	if [ -r "$parked_temp_file" ]; then
@@ -58,11 +53,6 @@ unpark_one_commit() {
 }
 
 unpark_all_commits() {
-	if [ ! -r  $FILE_COMMITS_PARKED ]; then
-		echo No parked commits file - aborting.
-		exit 42
-	fi
-
 	if [ -r $FILE_COMMITS_TO_REVIEW ]; then
 		todo_temp_file="$FILE_COMMITS_TO_REVIEW.temp"
 
@@ -76,7 +66,7 @@ unpark_all_commits() {
 			&& cat $todo_temp_file >> $FILE_COMMITS_TO_REVIEW \
 			&& rm $todo_temp_file
 	else
-		mv $FILE_COMMITS_TO_REVIEW $todo_temp_file
+		mv $FILE_COMMITS_PARKED $FILE_COMMITS_TO_REVIEW
 	fi
 }
 
@@ -84,6 +74,11 @@ main() {
 	if [ "$1" = '-h' ]; then
 		help
 		exit 0
+	fi
+
+	if [ ! -r  $FILE_COMMITS_PARKED ]; then
+		echo No parked commits file - aborting.
+		exit 42
 	fi
 
 	if [ "$1" = 'all' ]; then
