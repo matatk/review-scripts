@@ -20,4 +20,4 @@ review_commit_web() {
 alias rcw=review_commit_web
 
 # This one uses a wildcard, so beware
-alias rb='tar zcvf "review-state.$(date +%Y-%m-%d.%H%M).tar.gz" review.state.*'
+alias rb='tar zcvf "review-state.$(date +%Y-%m-%d.%H%M).tar.gz" review.config.sh review.state.*'
