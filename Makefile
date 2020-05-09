@@ -12,6 +12,7 @@ install: check
 	@cp -v review.record ~/bin/
 	@cp -v review.html.todo ~/bin/
 	@cp -v review.html.done ~/bin/
+	@cp -v review.channel ~/bin/
 	@echo To use the suggested aliases...
 	@echo "    . $(CURDIR)/aliases.sh >> ~/.?shrc"
 
@@ -23,6 +24,7 @@ uninstall:
 	-@rm -v ~/bin/review.record
 	-@rm -v ~/bin/review.html.todo
 	-@rm -v ~/bin/review.html.done
+	-@rm -v ~/bin/review.channel
 
 check:
 ifndef ECLINT

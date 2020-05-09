@@ -7,6 +7,7 @@ alias rp='review.park'
 alias ru='review.unpark'
 alias rrna='review.record na'
 alias rr='review.record log'
+alias rc='review.channel'
 
 # These let you view any commit as with review.next
 review_commit_txt() {

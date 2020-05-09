@@ -1,0 +1,104 @@
+#!/bin/sh
+. review.config.sh
+
+help() {
+	script=$(basename "$0")
+	echo "$script: switch review channels"
+	echo
+	echo "Usage: $script [-h] [-d] [channel-name]"
+	echo
+	echo "Options:"
+	echo "    -h              show this help message"
+	echo "    -d              switch to the default (no-name) channel"
+	echo "    channel-name    switch to given channel"
+	echo
+	echo "Show the current channel. Also switch to a new one, if given."
+	echo
+	echo "All reviews start with just the default channel, which has no"
+	echo "specific name, i.e. if you've stuck with 'review.state.todo'"
+	echo "then you're using the default channel."
+	echo
+	echo "You can make a new channel simply by creating another list of"
+	echo "commits to review, e.g. 'review.state.slartibartfast.todo'."
+	echo "It's best to split out new channels before starting the review."
+	echo "Once you've made new todo files, use this script to switch the"
+	echo "channel to one of them."
+	echo
+	echo "This script won't let you switch channels if you have a commit"
+	echo "currently in review."
+}
+
+# Repeated in review.next
+count_remaining_commits() {
+	list=$1
+	message=$2
+	echo "$(wc -l < "$list" | tr -d '[:space:]') $message"
+}
+
+main() {
+	if [ "$1" = '-h' ]; then
+		help
+		exit 0
+	fi
+
+	PRETTY_CURRENT="'$REVIEW_CHANNEL'"
+	[ -z "$REVIEW_CHANNEL" ] && PRETTY_CURRENT='the default channel'
+	echo "Current channel is: $PRETTY_CURRENT"
+
+	if [ -z "$1" ]; then
+		exit 0
+	fi
+
+	DESIRED_PRETTY="'$1'"  # Pretty name for user's request
+	DESIRED="$1"           # Pretty name for user's request
+	TRY=".$1"              # When making filenames there'd be an extra dot...
+
+	if [ "$1" = "-d" ]; then
+		DESIRED_PRETTY='default'
+		DESIRED=''
+		TRY=''             # ...unless the string is empty.
+	fi
+
+	if [ "$REVIEW_CHANNEL" = "$DESIRED" ]; then
+		echo "Not changing to current channel"
+		exit 42
+	fi
+
+	if [ -r "$FILE_COMMIT_IN_REVIEW" ]; then
+		echo "Can't change channels; there's a commit in review."
+		exit 42
+	fi
+
+	TRY_FILE_COMMITS_TO_REVIEW=$STATE_PREFIX$TRY$STATE_SUFFIX_TO_REVIEW
+	TRY_FILE_COMMIT_IN_REVIEW=$STATE_PREFIX$TRY$STATE_SUFFIX_IN_REVIEW
+	TRY_FILE_COMMITS_REVIEWED=$STATE_PREFIX$TRY$STATE_SUFFIX_REVIEWED
+	TRY_FILE_COMMITS_PARKED=$STATE_PREFIX$TRY$STATE_SUFFIX_PARKED
+
+	if [ ! -r "$TRY_FILE_COMMITS_TO_REVIEW" ] \
+		&& [ ! -r "$TRY_FILE_COMMIT_IN_REVIEW" ] \
+		&& [ ! -r "$TRY_FILE_COMMITS_REVIEWED" ] \
+		&& [ ! -r "$TRY_FILE_COMMITS_PARKED" ]; then
+			echo "There doesn't seem to be a $DESIRED_PRETTY channel."
+			exit 42
+	fi
+
+	echo "Changing channel to: $DESIRED_PRETTY..."
+	sed \
+		-i '' \
+		"s/^export REVIEW_CHANNEL='.*'$/export REVIEW_CHANNEL='$DESIRED'/" \
+		review.config.sh
+
+	if [ -r "$TRY_FILE_COMMITS_TO_REVIEW" ]; then
+		count_remaining_commits "$TRY_FILE_COMMITS_TO_REVIEW" 'left to review'
+	else
+		echo No commits to review
+	fi
+
+	if [ -r "$TRY_FILE_COMMITS_REVIEWED" ]; then
+		echo Some commits reviewed
+	else
+		echo No commits reviewed
+	fi
+}
+
+main "$@"

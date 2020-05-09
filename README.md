@@ -12,7 +12,7 @@ There are three main steps involved...
 * **Use `review.next` to fetch the next commit:** you can review it locally using `git show` or, if it's hosted somewhere, on the web. You may be able to find out more context around the commit via its web page, such as related pull requests, issues and discussions.
 * **Use `review.record` to log notes about the current commit:** e.g. if you filed some issues, you could list their numbers. A shortcut is provided to mark a commit as not applicable to your current review.
 
-It's also possible to 'park' the current commit for review later on; more on that later.
+It's also possible to **'park' the current commit for review later** and to **separate commits to review into different 'channels'**—more on all of that later.
 
 Two additional scripts are provided to make HTML versions of the list of commits to review (`review.html.todo`) and the list of reviewed commits and related notes (`review.html.done`).
 
@@ -27,8 +27,8 @@ If you have [shellcheck](https://github.com/koalaman/shellcheck) installed, it i
 
 To make things even quicker when performing a review, some command aliases are suggested (in `aliases.sh`); instructions as to how to use them are provided when running `make`.
 
-Detailed workflow steps
------------------------
+Full workflow
+-------------
 
 1. Move into the checked-out repo containing the document to be reviewed and run `review.init`. A configuration file, `review.config.sh` (currently tuned for reviewing the HTML standard) will be generated in the current directory. You can edit this file to change the parameters of the review.
 
@@ -61,6 +61,16 @@ If you get stuck and need to return to a particular commit later, you can 'park'
 
    If you have multiple parked commits and want to bring them _all_ back to the start of the todo list, you can issue `review.unpark all`—doing so will keep things in order.
 
+### Channels
+
+You may have been asked to look at some commits in particular; these have higher precedence than the others, so it makes sense to maintain them in separate lists (with corresponding separate other state files), so you can review them first.
+
+Once `review.init` has crated the default `review.state.todo` file, you can use a text editor to split it into two separate lists, e.g. `reivew.state.highlighted.todo` and `review.state.others.todo`. The 'channels' here being 'highlighted' and 'others'.
+
+**Naming note:** the channel name must be in the place as indicated above.
+
+You can then use `review.channel` to switch between the two lists. The other commands will maintain separate copies of the review state for each channel.
+
 ### Online help
 
 All of the scripts support the `-h` option (be sure to pass it as the first argument).
@@ -76,11 +86,13 @@ If you want to share a review across multiple people, you can use the `split` co
 
 3. Use `split -l <lines-per-person> review.state.todo` to create separate files for each person. You can tweak the generated files' names—more info can be found via `man split`.
 
+You could also collaborate by each working on separate channels, as described above.
+
 Limitations
 -----------
 
-There are no tests! Though [shellcheck](https://github.com/koalaman/shellcheck) is used as a linter, at least. The scripts were written to (hopefully :-)) help with a review in progress; if the workflow turns out to be useful, re-writing with [test-driven development](https://en.wikipedia.org/wiki/Test-driven_development) would be a good idea.
+There are no tests! Though [shellcheck](https://github.com/koalaman/shellcheck) is used as a linter, at least. The scripts were written to help with specific reviews. Perhaps re-writing with [test-driven development](https://en.wikipedia.org/wiki/Test-driven_development) would be a good idea.
 
-The designated order of reviewing commits is chronological. This means that you may review something that is superseded by a more recent commit. There could be some wasted time reviewing things that are replaced later, but it could be valuable to know the history. Something to reflect upon after the current review.
+The designated order of reviewing commits is chronological. This means that you may review something that is superseded by a more recent commit. There could be some wasted time reviewing things that are replaced later, but it could be valuable to know the history.
 
 The revisions are filtered for commits that affect a specific source file (so as to concentrate on the specification under review). Only one source file is supported.

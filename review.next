@@ -60,6 +60,7 @@ get_next_commit() {
 	hash=$(cut -d ' ' -f 1 < $FILE_COMMIT_IN_REVIEW)
 }
 
+# Repeated in review.channel
 count_remaining_commits() {
 	list=$1
 	message=$2

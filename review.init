@@ -43,10 +43,16 @@ export NONESSENTIAL_COMMIT_MSG_EXTENDED_REGEXP='^.{8} (Editorial|Meta): '
 export SOURCE_FILE='source'
 export URL_COMMIT_START='https://github.com/whatwg/html/commit'  # / added later
 
-export FILE_COMMITS_TO_REVIEW='review.state.todo'
-export FILE_COMMIT_IN_REVIEW='review.state.current'
-export FILE_COMMITS_REVIEWED='review.state.done'
-export FILE_COMMITS_PARKED='review.state.parked'
+export REVIEW_CHANNEL=''  # set this with 'review.channel'
+export STATE_PREFIX='review.state'
+export STATE_SUFFIX_TO_REVIEW='.todo'
+export STATE_SUFFIX_IN_REVIEW='.current'
+export STATE_SUFFIX_REVIEWED='.done'
+export STATE_SUFFIX_PARKED='.parked'
+export FILE_COMMITS_TO_REVIEW="\$STATE_PREFIX\${REVIEW_CHANNEL:+.}\$REVIEW_CHANNEL\$STATE_SUFFIX_TO_REVIEW"
+export FILE_COMMIT_IN_REVIEW="\$STATE_PREFIX\${REVIEW_CHANNEL:+.}\$REVIEW_CHANNEL\$STATE_SUFFIX_IN_REVIEW"
+export FILE_COMMITS_REVIEWED="\$STATE_PREFIX\${REVIEW_CHANNEL:+.}\$REVIEW_CHANNEL\$STATE_SUFFIX_REVIEWED"
+export FILE_COMMITS_PARKED="\$STATE_PREFIX\${REVIEW_CHANNEL:+.}\$REVIEW_CHANNEL\$STATE_SUFFIX_PARKED"
 
 export HTML_STYLE='
 	table { border-collapse: collapse; }
@@ -60,7 +66,7 @@ EOF
 	echo
 	cat $config_file
 	echo
-	echo If this seems OK, press Enter to continue.
+	echo If this is OK, press Enter to continue and the commits will be collated.
 	echo Otherwise: interrupt the script, edit the config and re-run the script.
 	read -r
 fi
@@ -85,6 +91,12 @@ grep_nonessential_commits() {
 
 echo "$(commits_in_range | wc -l | tr -d '[:space:]') commits between the dates"
 echo "$(commits_in_range | grep_nonessential_commits -vc) substantive commits between the dates"
+echo
 
 echo Saving commits to review, in chronological order...
 commits_in_range | grep_nonessential_commits -v > "$FILE_COMMITS_TO_REVIEW"
+echo
+
+echo If you want to maintain separate lists of commits to review, you can
+echo separate them into different todo files now, and use \'review.channel\'
+echo to switch between them.
