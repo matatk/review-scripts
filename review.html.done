@@ -25,7 +25,7 @@ done
 shift $((OPTIND-1))
 
 if [ ! -r "$reviewed_file" ]; then
-	echo "No commits to review - aborting"
+	echo "No commits reviewed - aborting"
 	exit 42
 fi
 
