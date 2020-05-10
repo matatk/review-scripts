@@ -89,6 +89,11 @@ grep_nonessential_commits() {
 	grep -E "$NONESSENTIAL_COMMIT_MSG_EXTENDED_REGEXP" "$@"
 }
 
+if [ ! -r "$SOURCE_FILE" ]; then
+	echo "Can't find source file: '$SOURCE_FILE'"
+	exit 42
+fi
+
 echo "$(commits_in_range | wc -l | tr -d '[:space:]') commits between the dates"
 echo "$(commits_in_range | grep_nonessential_commits -vc) substantive commits between the dates"
 echo
