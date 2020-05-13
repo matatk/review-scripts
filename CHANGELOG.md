@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/matatk/review-scripts/compare/v0.2.0...v0.3.0) (2020-05-13)
+
+
+### Features
+
+* **Channels:** Support multiple review channels ([215df21](https://github.com/matatk/review-scripts/commit/215df21714458c69811c32454237f642cf78edff))
+
+
+### Bug fixes
+
+* **Aliases:** Include review.config.sh in backup ([dd54dc3](https://github.com/matatk/review-scripts/commit/dd54dc35f20149eda4810bfb89e35ff5a3011bf7))
+* **review.html.done:** Correct the error message ([fbc4e5d](https://github.com/matatk/review-scripts/commit/fbc4e5dd6ca847e3c5ccb756359b5271a31b681d))
+* **review.init:** Check for presence of source file ([6e2e942](https://github.com/matatk/review-scripts/commit/6e2e94211c68bdd5f4058b26bc57e5f67287a020))
+
 ## [0.2.0](https://github.com/matatk/review-scripts/compare/v0.1.0...v0.2.0) (2019-11-01)
 
 
